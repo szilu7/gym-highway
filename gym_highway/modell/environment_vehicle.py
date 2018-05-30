@@ -2,6 +2,10 @@ from gym_highway.modell.vehicle_base import BaseVehicle
 import numpy as np
 
 
+log_cnt = 0
+logs_in_file = 40
+log_list = []
+
 class Envvehicle(BaseVehicle):
 
     def __init__(self, dict):
@@ -16,6 +20,7 @@ class Envvehicle(BaseVehicle):
         self.lanewidth = self.envdict['lane_width']
         self.oldlane = 0
         self.skip = 0
+
 
     def _getrandom(self):
         sigma = 5
@@ -34,6 +39,7 @@ class Envvehicle(BaseVehicle):
         :param vleft: vehicle to the left
         :return: Vehicle reached highway limit (front or rear)
         """
+
         if self.state == 'in_lane':
             acc = 0
             # Desired acceleration
@@ -49,9 +55,12 @@ class Envvehicle(BaseVehicle):
                 if dx < 0:
                     print('Collision, ID: ', self.ID, ' vnext ID: ', vnext.ID, ' in lane: ', self.laneindex)
                     print(vnext.x, ' - ', vnext.length, ' - ', self.x)
+                    env_save_log()
                     raise CollisionExc('Collision')
+                    print('Collision')
                 # desired following dist
-                dist = vnext.vx * 1.4
+                #dist = vnext.vx * 1.4
+                dist = vnext.vx * 1.2
                 ddist = dist - dx
                 accghr = -1 * ddist + 10 * dv
 
@@ -124,9 +133,12 @@ class Envvehicle(BaseVehicle):
                 dx = vnext.x - vnext.length - self.x
                 if dx < 0:
                     print('Collision, ID: ', self.ID, ' vnext ID: ', vnext.ID, ' in lane: ', self.laneindex)
+                    env_save_log()
                     raise CollisionExc('Collision')
+                    print('Collision')
                 # desired following dist
-                dist = vnext.vx * 1.4
+                #dist = vnext.vx * 1.4
+                dist = vnext.vx * 1.2
                 ddist = dist - dx
                 accghr = -1 * ddist + 10 * dv
 
@@ -154,10 +166,13 @@ class Envvehicle(BaseVehicle):
                 dx = vnext.x - vnext.length - self.x
                 if dx < 0:
                     print('Collision, ID: ', self.ID, ' vnext ID: ', vnext.ID, ' in lane: ', self.laneindex)
+                    env_save_log()
                     raise CollisionExc('Collision')
+                    print('Collision')
 
                 # desired following dist
-                dist = vnext.vx * 1.0
+                #dist = vnext.vx * 1.4
+                dist = vnext.vx * 1.2
                 ddist = dist - dx
                 accghr = -1 * ddist + 10 * dv
 
@@ -189,12 +204,12 @@ class Envvehicle(BaseVehicle):
                         if (self.vx > (0.8 * vleft_b.vx)) and (((self.x - self.length - vleft_b.x) / 3) > self.length):
                             if not (vleft_a is None):
                                 if (((vleft_a.x - vleft_a.length - self.x) / 3) > self.length) and \
-                                        (vleft_a.vx > (self.x *0.8)):
+                                        (vleft_a.vx > (self.vx * 0.8)):
                                     self.state = 'switch_lane_left'
                                     self.change_needed = 1
                                     self.maxacc = 2
                                     self.oldlane = self.laneindex
-                                    print('Overtake at: ', self.x)
+                                    #print('Overtake at: ', self.x)
                                 else:
                                     self.state = 'in_lane'
                                     self.vx = vnext.vx
@@ -203,7 +218,7 @@ class Envvehicle(BaseVehicle):
                                 self.change_needed = 1
                                 self.maxacc = 2
                                 self.oldlane = self.laneindex
-                                print('Overtake at: ', self.x)
+                                #print('Overtake at: ', self.x)
                         else:
                             self.state = 'in_lane'
                             self.vx = vnext.vx
@@ -214,7 +229,7 @@ class Envvehicle(BaseVehicle):
                                 self.change_needed = 1
                                 self.maxacc = 2
                                 self.oldlane = self.laneindex
-                                print('Overtake at: ', self.x)
+                                #print('Overtake at: ', self.x)
                             else:
                                 self.state = 'in_lane'
                                 self.vx = vnext.vx
@@ -223,7 +238,7 @@ class Envvehicle(BaseVehicle):
                             self.change_needed = 1
                             self.maxacc = 2
                             self.oldlane = self.laneindex
-                            print('Overtake at: ', self.x)
+                            #print('Overtake at: ', self.x)
             else:
                 self.state = 'in_lane'
         reachedend = False
@@ -257,9 +272,12 @@ class Envvehicle(BaseVehicle):
             dv = vnext.vx - self.vx
             dx = vnext.x - vnext.length - self.x
             if dx < 0:
+                env_save_log()
                 raise CollisionExc('Collision')
+                print('Collision')
             # desired following dist
-            dist = vnext.vx * 1.4
+            #dist = vnext.vx * 1.4
+            dist = vnext.vx * 1.2
             ddist = dist - dx
             accghr = -1 * ddist + 10 * dv
 
@@ -284,3 +302,23 @@ class CollisionExc(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+def env_add_entry(text):
+    global log_cnt
+
+    log_cnt += 1
+    write = 'Step ' + str(log_cnt) + '\n'
+    write += text
+    log_list.append(write)
+
+    if log_cnt > logs_in_file:
+        log_list.pop(0)
+
+def env_save_log():
+    if log_cnt > logs_in_file:
+        log_file = open(r'D:\log_file.txt', 'w+')
+        for i in range(logs_in_file):
+            entry = log_list[i]
+            log_file.write(entry)
+        log_file.close()
