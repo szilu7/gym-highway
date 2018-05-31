@@ -6,7 +6,6 @@ import copy
 from gym_highway.modell.ego_vehicle import Egovehicle
 from gym_highway.modell.environment_vehicle import Envvehicle, env_add_entry
 
-
 class Modell:
     def __init__(self, envdict):
         self.envdict = envdict
