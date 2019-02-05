@@ -1,7 +1,7 @@
 from gym_highway.modell.vehicle_base import BaseVehicle
 import numpy as np
 
-
+#LOGFILE_PATH
 log_cnt = 0
 logs_in_file = 40
 log_list = []
@@ -201,7 +201,7 @@ class Envvehicle(BaseVehicle):
                 s = (vnext.x - vnext.length - self.x)
                 if (s / 3) < self.length:
                     if not (vleft_b is None):
-                        if (self.vx > (0.8 * vleft_b.vx)) and (((self.x - self.length - vleft_b.x) / 3) > self.length):
+                        if (self.vx > (0.95 * vleft_b.vx)) and (((self.x - self.length - vleft_b.x) / 3) > self.length):
                             if not (vleft_a is None):
                                 if (((vleft_a.x - vleft_a.length - self.x) / 3) > self.length) and \
                                         (vleft_a.vx > (self.vx * 0.8)):

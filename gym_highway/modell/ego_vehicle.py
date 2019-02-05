@@ -111,7 +111,6 @@ class Egovehicle(BaseVehicle):
 
         if (self.state == 'command_receive'):
             if action == 0:    #
-            #if action == b'4':  #
                 self.cmd = 'switch_lane_left'
                 self.change_needed = 1
                 self.oldlane = self.laneindex
@@ -119,7 +118,6 @@ class Egovehicle(BaseVehicle):
                 self.switch_lane_left()
 
             elif action == 1:  #
-            #elif action == b'6':  #
                 self.cmd = 'switch_lane_right'
                 self.change_needed = 1
                 self.oldlane = self.laneindex

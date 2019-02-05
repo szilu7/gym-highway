@@ -27,7 +27,7 @@ globals['lane_width'] = 4        # Width of one Lane in [m]
 globals['lane_count'] = 3        # Number of lanes
 
 # Agent action parameters
-globals['action_space']= 'DISCRETE'    # agent action type. Choose from: 'DISCRETE' 'CONTINUOUS' 'STATEMACHINE'
+globals['action_space']= 'STATEMACHINE'    # agent action type. Choose from: 'DISCRETE' 'CONTINUOUS' 'STATEMACHINE'
 
 # parameters for DISCRETE action. Sets of steering angles (st in[rad]) and accelerations ([ac in m/s^2]) to chose from
 globals['discreteparams']={'st' : [-0.003, -0.0005, 0, 0.0005, 0.003],'ac' : [-6.0, -2.0, 0.0, 2.0, 3.5] }
@@ -43,17 +43,24 @@ globals['density_lanes_UB'] = 26  # Upper bound of the random density for one la
 globals['speed_lane0'] = [30.0, 9.0]  # generated vehicle desired speed lane 0 [m/s]
 globals['speed_lane1'] = [35.0, 9.0]  # generated vehicle desired speed lane 1 [m/s]
 globals['speed_lane2'] = [40.0, 9.0]  # generated vehicle desired speed lane 2 [m/s]
-globals['speed_lane3'] = [40.0, 9.0]  # generated vehicle desired speed lane 2 [m/s]
-globals['speed_lane4'] = [40.0, 9.0]  # generated vehicle desired speed lane 2 [m/s]
 
 # Agent vehicle desired Speed
 globals['speed_ego_desired'] = 130.0/3.6  # Agent vehicle desired speed [m/s]
+
 
 # Subreward Weights
 globals['creward'] = 0.3 # Subreward weight for distances to other vehicles
 globals['lreward'] = 0.3 # Subreward weight for keeping right behavior
 globals['yreward'] = 0.1 # Subreward weight for (not) leaving highway
 globals['vreward'] = 0.3 # Subreward weight for keeping desired speed
+
+
+"""
+globals['creward'] = 0.05 # Subreward weight for distances to other vehicles
+globals['lreward'] = 0.85 # Subreward weight for keeping right behavior
+globals['yreward'] = 0.05 # Subreward weight for (not) leaving highway
+globals['vreward'] = 0.05 # Subreward weight for keeping desired speed
+"""
 
 class EPHighWayEnv(gym.Env):
     metadata = {
@@ -149,10 +156,20 @@ class EPHighWayEnv(gym.Env):
         # LANE BASED REWARD
         lreward = 0
         laneindex = self.modell.egovehicle.laneindex
+
         if laneindex > 0:
             if (self.state[13] == 0) and (self.state[4] > 30):
                 lreward = -min(1, max(0, (self.state[4] - 50.0) / 20.0))
         lreward += 1.
+
+
+        """
+        if laneindex > 0:
+            if (self.state[13] == 0) and (self.state[4] > 30):
+                lreward = (-min(1, max(0, (self.state[4] - 50.0) / 20.0))) * 3
+        lreward += 1.
+        """
+
         # POSITION BASED REWARD
         # dy=abs(self.modell.egovehicle.y-laneindex*self.envdict['lane_width'])
         dy = abs(self.modell.egovehicle.y - (self.envdict['lane_count'] - 1.0) / 2 * self.envdict['lane_width'])

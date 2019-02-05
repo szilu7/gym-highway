@@ -6,6 +6,7 @@ import time
 import sys
 import matplotlib.pyplot as plt
 from msvcrt import getch, kbhit
+from msvcrt import getch, kbhit
 env = gym.make('EPHighWay-v0')
 env.reset()
 
@@ -47,6 +48,7 @@ ac = [-6.0, -2.0, 0.0, 2.0, 3.5]
 
 action=12
 t = time.time()
+
 for i in range(10000):
     env.render()
     plt.gcf().canvas.mpl_connect('key_press_event', press)
@@ -67,9 +69,9 @@ for i in range(10000):
         plt.close('all')
     action = 12#np.random.randint(0,25)
     if terminated:
-        #print(state)
-        #print(reward)
-        #print(cause)
+        print(state)
+        print(reward)
+        print(cause)
         #action = 12
         env._reset()# some comment wee added
 elapsed=time.time()-t

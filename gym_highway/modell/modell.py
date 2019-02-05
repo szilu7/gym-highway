@@ -6,6 +6,7 @@ import copy
 from gym_highway.modell.ego_vehicle import Egovehicle
 from gym_highway.modell.environment_vehicle import Envvehicle, env_add_entry
 
+
 class Modell:
     def __init__(self, envdict):
         self.envdict = envdict
@@ -294,7 +295,10 @@ class Modell:
                             if vehicle.ID == veh.ID:
                                 oldlane.remove(vehicle)
                     #print("ID: " + str(veh.ID) + " laneindex: " + str(veh.laneindex) + " oldlane: " + str(veh.oldlane))
-                    lane.remove(veh)
+                    try:
+                        lane.remove(veh) #ValueError: list.remove(x): x not in list
+                    except ValueError:
+                        print("x not in list")
 
         # 4.5 Recheck position
         fine, cause = self.check_position()
